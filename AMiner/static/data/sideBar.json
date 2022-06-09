@@ -24,8 +24,8 @@
         "title": "图表",
         "children": [
             {
-                "index": "/page/chart/sChart",
-                "title": "vue-schart"
+                "index": "/page/chart/EChart",
+                "title": "vue-echart"
             }
         ]
     },

@@ -24,7 +24,7 @@ import PersonalCenter from '../views/page/PersonalCenter';	//个人中心
 	import DataSource from "../views/table/DataSource";	//组定义表格组件
 
 	//图表组件
-	import Schart from "../views/charts/Schart.vue";
+	import Echart from "../views/charts/Echart.vue";
 
 	//表单组件
 	import Baseform from "../views/form/baseform.vue";
@@ -146,8 +146,8 @@ export default new Router({
 					component:Empty,
 					children:[
 						{
-							path:'sChart',
-							component:Schart
+							path:'EChart',
+							component:Echart
 						}
 					]
 				},
