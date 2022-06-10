@@ -123,6 +123,9 @@
             }, {
                 "index": "/page/else/tree",
                 "title": "树形组件"
+            }, {
+                "index": "/page/else/graph",
+                "title": "图数据展示"
             }
         ]
     }
