@@ -6,7 +6,44 @@
                 <el-breadcrumb-item>vue-echart</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <div id="myChart" style="width: 600px;height:400px;"></div>
+        <!-- <div id="myChart" style="width: 600px;height:400px;"></div> -->
+		<div class="dataSearch">
+                <el-card class="box-card">
+                    <el-row>
+                        <el-col :span="4">在线智搜</el-col>
+                        <el-col :span="9">
+							<el-col :span="12">
+                            	<el-input v-model="input1" placeholder="请输入实体1"></el-input></el-col>
+                            <el-col :span="12">
+                            	<el-input v-model="input2" placeholder="请输入实体2"></el-input>
+                            </el-col>
+                            
+                        </el-col>
+						<el-col :span="9">
+								<el-col :span="10">
+									<el-date-picker type="date" placeholder="选择开始日期" :picker-options="pickerOptions"  v-model="form.start" style="width: 100%;"></el-date-picker>
+								</el-col>
+								<el-col class="line" :span="2">至</el-col>
+								<el-col :span="10">
+									<el-date-picker type="date" placeholder="选择结束日期" :picker-options="pickerOptions" v-model="form.end" style="width: 100%;"></el-date-picker>
+								</el-col>
+						</el-col>
+						<el-col :span="2">
+                                <el-button round @click="search">搜索</el-button>
+                            </el-col>
+                    </el-row>
+                </el-card>
+                <el-row>
+                    <el-col :span="5">
+                        <el-card class="information">
+                        </el-card>
+                    </el-col>
+                    <el-col :span="19">
+                        <el-card class="graph">
+                        </el-card>
+                    </el-col>
+                </el-row>
+            </div>
 	</div>
 </template>
 
@@ -14,7 +51,18 @@
 	export default {
 		data () {
 			return {
-				source:{}
+				source:{},
+				form:{
+					start:"",
+					end:"",
+				},
+				pickerOptions:{
+					disabledDate (time) {
+						return time.getTime() > Date.now();
+					}
+				},
+				input1:'',
+				input2:'',
 			}
 		},
 		methods:{
@@ -46,6 +94,9 @@
 			};
 			// 使用刚指定的配置项和数据显示图表。
 			myChart.setOption(option);
+			},
+			search(){
+
 			}
 		},
 		mounted() {
