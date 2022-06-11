@@ -59,7 +59,7 @@ import PersonalCenter from '../views/page/PersonalCenter';	//个人中心
 	import Drag from '../views/else/drag.vue';
 	import Tree from "../views/else/Tree.vue";
 	import Graph from "../views/else/Graph.vue";
-
+	import SearchField from "../views/else/SearchField.vue";
 
 Vue.use(Router);
 
@@ -143,6 +143,10 @@ export default new Router({
 						{
 							path:'graph',
 							component:Graph
+						},
+						{
+							path:'searchField',
+							component:SearchField
 						}
 					]
 				},
