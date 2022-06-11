@@ -9,12 +9,18 @@
         <!-- <div id="myChart" style="width: 600px;height:400px;"></div> -->
 		<div class="dataSearch">
                 <el-card class="box-card">
-                    <el-row>
+                    <el-row  :gutter="20">
                         <el-col :span="4">在线智搜</el-col>
                         <el-col :span="9">
-							<el-col :span="12">
+							<el-col :span="10">
+								<el-select v-model="form.paperType1" placeholder="请选择实体类型" clearable>
+									<el-option :key="item.value" :value="item.value" :label="item.name" :disabled="item.disabled" v-for="item in paperType1"></el-option>
+								</el-select>
                             	<el-input v-model="input1" placeholder="请输入实体1"></el-input></el-col>
-                            <el-col :span="12">
+                            <el-col :span="10">
+							<el-select v-model="form.paperType2" placeholder="请选择实体类型" clearable>
+									<el-option :key="item.value" :value="item.value" :label="item.name" :disabled="item.disabled" v-for="item in paperType2"></el-option>
+								</el-select>
                             	<el-input v-model="input2" placeholder="请输入实体2"></el-input>
                             </el-col>
                             
@@ -55,6 +61,8 @@
 				form:{
 					start:"",
 					end:"",
+					paperType1:[],
+					paperType2:[]
 				},
 				pickerOptions:{
 					disabledDate (time) {
@@ -63,6 +71,44 @@
 				},
 				input1:'',
 				input2:'',
+				paperType1:[
+					{
+						"name":"作者",
+						"value":"Author"
+					},{
+						"name":"论文",
+						"value":"Paper",
+					},{
+						"name":"研究机构/学校",
+						"value":"Affliation"
+					},{
+						"name":"研究主题",
+						"value":"Subject"
+					}
+					,{
+						"name":"会议/期刊",
+						"value":"PublicationVenue"
+					}
+				],
+				paperType2:[
+					{
+						"name":"作者",
+						"value":"Author"
+					},{
+						"name":"论文",
+						"value":"Paper",
+					},{
+						"name":"研究机构/学校",
+						"value":"Affliation"
+					},{
+						"name":"研究主题",
+						"value":"Subject"
+					}
+					,{
+						"name":"会议/期刊",
+						"value":"PublicationVenue"
+					}
+				],
 			}
 		},
 		methods:{
@@ -96,7 +142,9 @@
 			myChart.setOption(option);
 			},
 			search(){
-
+				console.log("时间",this.form)
+				console.log("实体1",this.input1)
+				console.log("实体2",this.input2)
 			}
 		},
 		mounted() {
