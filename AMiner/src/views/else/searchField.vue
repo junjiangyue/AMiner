@@ -10,14 +10,27 @@
       <div class="dataSearch">
         <el-card class="box-card">
           <el-row>
-            <el-col :span="12">在线智搜</el-col>
-            <el-col :span="12">
-                <el-col :span="12">
-                <el-input v-model="input" placeholder="请输入内容"></el-input>
-                </el-col>
-                <el-col :span="12">
-                    <el-button round>搜索</el-button>
-                </el-col>
+            <el-col :span="3">邻域查询</el-col>
+            <el-col :span="8">
+              请选择查询对象：<el-select v-model="value" placeholder="请选择查询对象">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="8">
+              <el-col :span="9">
+                请输入查询邻域：
+              </el-col>
+              <el-col :span="15">
+                <el-input v-model="input" placeholder="请输入查询邻域"></el-input>
+              </el-col>
+            </el-col>
+            <el-col :span="5">
+              <el-button class="mar-left">查询</el-button>
             </el-col>
           </el-row>
         </el-card>
@@ -40,10 +53,23 @@
 		data () {
 			return {
 				input: '',
-                authorName: 'Bob Jolls',
-            
+        authorName: 'Bob Jolls',
             // 防止出现多个echarts初始化的情况
-            myChart: ''
+        myChart: '',
+        options: [{
+          value: '选项1',
+          label: '关键作者'
+        }, {
+          value: '选项2',
+          label: '关键单位'
+        }, {
+          value: '选项3',
+          label: '关键期刊'
+        }, {
+          value: '选项4',
+          label: '关键会议'
+        }],
+        value: ''
 			}
 		},
         mounted:function(){
@@ -209,5 +235,8 @@
   .graph {
       width: 100%;
     height: 500px;
+  }
+  .mar-left {
+    margin-left: 30px;
   }
 </style>

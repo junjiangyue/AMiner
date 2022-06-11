@@ -126,6 +126,9 @@
             }, {
                 "index": "/page/else/graph",
                 "title": "图数据展示"
+            }, {
+                "index": "/page/else/searchField",
+                "title": "领域搜索"
             }
         ]
     }
