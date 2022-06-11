@@ -16,7 +16,7 @@
                             <el-input v-model="input" placeholder="请输入内容"></el-input>
                             </el-col>
                             <el-col :span="12">
-                                <el-button round>搜索</el-button>
+                                <el-button round @click="search">搜索</el-button>
                             </el-col>
                         </el-col>
                     </el-row>
@@ -28,6 +28,7 @@
                     </el-col>
                     <el-col :span="19">
                         <el-card class="graph">
+                            <div id="main" style="width: 600px;height:400px;"></div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -36,20 +37,21 @@
 	</div>
 </template>
 <script>
+import * as echarts from 'echarts';
 	export default {
 		data () {
 			return {
 				input: '',
                 authorName: 'Bob Jolls',
-            
-            // 防止出现多个echarts初始化的情况
-            myChart: ''
 			}
 		},
         mounted:function(){
             this.getData();
         },
         methods: {
+            search() {
+                this.getGraph();
+            },
             getData() {
                 this.$axios({
           method:"get",
@@ -64,127 +66,118 @@
         })
             },
 
-            // 绘制知识图谱
-        getGraph(p1, p2) {
-            // 若已经存在有初始化了的echarts实例，就直接进行绘制
-            if(this.myChart) {
-                this.configGraph(p1, p2);
-            }else {
-                // 没有初始化的echarts实例，就初始化一个
-                this.myChart = this.$echarts.init(this.$refs.graph);
-                this.configGraph(p1, p2);
-            }
-            
+         getGraph() {
+            var myChart = echarts.init(document.getElementById('main'));
+            var categories = [{name:"蜀"},{name:"魏"},{name:"吴"}];
+            var option = {
+        // 图的标题
+        title: {
+            text: '关联关系和关联实体图'
         },
-
-            // 绘制知识图谱的配置项
-            configGraph(p1, p2) {
-            // 保存传进来的节点和关系数据
-            let mydata = p1;
-            let links = p2;
-            
-            // 图谱的配置项
-            let option = {
-                    // 提示框的配置
-                    tooltip: {
-                        trigger: 'item'//设置提示框的内容和格式 节点和边都显示name属性
-                    },
-                    //图形上的文本标签，可用于说明图形的一些数据信息
-                    label: {
-                        fontSize: 12
-                    },
-                    legend: {
-                        x: "center",
-                        show: true
-                    },
-                    series: [
-                        {
-                            type: 'graph',// 类型:关系图
-                            layout: 'force',//图的布局，类型为力导图
-                            symbolSize: 50,//节点大小
-                            emphasis: {
-                                focus: 'adjacency'
-                            },//当鼠标移动到节点上，突出显示节点以及节点的边和邻接节点
-                            draggable: true,//指示节点是否可以拖动
-                            roam: true,
-                            // 两端的样式（无 / 箭头）
-                            edgeSymbol: ['none', 'arrow'],
-                            // 不同节点的颜色之类的配置
-                            categories: [{
-                                name: '电影',
-                                itemStyle: {
-                                        color: "lightgreen"
-                                }
-                            }, {
-                                name: '主演',
-                                itemStyle: {
-                                        color: "orange",
-                                }
-                            }, {
-                                name: '类型',
-                                itemStyle: {
-                                        color: "pink",
-                                }
-                            }, {
-                                name: '导演',
-                                itemStyle: {
-                                        color: "lightblue",
-                                }
-                            },{
-                                name: 'TMDbID',
-                                itemStyle: {
-                                        color: "#fcce4c",
-                                }
-                            }],
-                            // 节点上的文字
-                            label: {
-                                    show: true,
-                                    fontSize: 12,
-                                    color: "black",
-                            },
-                            force: {
-                                repulsion: 1200,//节点之间的斥力因子。支持数组表达斥力范围，值越大斥力越大。
-                                gravity: 0.1, //节点受到的向中心的引力因子。该值越大节点越往中心点靠拢。
-                            },
-                            edgeSymbolSize: [4, 6], // 边两端的标记(箭头)大小，可以是一个数组分别指定两端，也可以是单个统一指定。
-                            // 边上显示的文字
-                            edgeLabel: {
-                                    show: true,
-                                    fontSize: 12,
-                                    formatter: "{c}"
-                            },
-                            // 节点数据
-                            data: mydata,
-                            // 关系数据
-                            links: links,
-                            // 边的样式
-                            lineStyle: {
-                                    opacity: 0.9,
-                                    width: 1.1,
-                                    curveness: 0,
-                                    color: "#262626",
-                            }
-                        }
-                    ]
-            };
-
-            //节点自定义拖拽不回弹
-            const chart = this.myChart;
-            chart.on('mouseup', function (params) {
-                var option = chart.getOption();
-                option.series[0].data[params.dataIndex].x = params.event.offsetX;
-                option.series[0].data[params.dataIndex].y = params.event.offsetY;
-                option.series[0].data[params.dataIndex].fixed = true;
-                chart.setOption(option);
-            });
-
-            // 使用刚指定的配置项和数据显示图表。
-            this.myChart.setOption(option);
-        }
+        // 提示框的配置
+        tooltip: {
+            formatter: function (x) {
+                return x.data.des;
+            }
+        },
+        // 工具箱
+        toolbox: {
+            // 显示工具箱
+            show: true,
+            feature: {
+                mark: {
+                    show: true
+                },
+                // 还原
+                restore: {
+                    show: true
+                },
+                // 保存为图片
+                saveAsImage: {
+                    show: true
+                }
+            }
+        },
+        legend: [{
+            // selectedMode: 'single',
+            //设置可以根据类别显示or隐藏节点
+            data: categories.map(function (a) {
+                return a.name;
+            })
+        }],
+        series: [{
+            type: 'graph', // 类型:关系图
+            layout: 'force', //图的布局，类型为力导图
+            symbolSize: 40, // 调整节点的大小
+            roam: true, // 是否开启鼠标缩放和平移漫游。默认不开启。如果只想要开启缩放或者平移,可以设置成 'scale' 或者 'move'。设置成 true 为都开启
+            edgeSymbol: ['circle', 'arrow'],
+            edgeSymbolSize: [2, 10],
+            edgeLabel: {
+                normal: {
+                    textStyle: {
+                        fontSize: 20
+                    }
+                }
+            },
+            force: {
+                repulsion: 2500,
+                edgeLength: [10, 50]
+            },
+            draggable: true,
+            lineStyle: {
+                normal: {
+                    width: 2,
+                    color: '#4b565b',
+                }
+            },
+            edgeLabel: {
+                normal: {
+                    show: true,
+                    formatter: function (x) {
+                        return x.data.name;
+                    }
+                }
+            },
+            label: {
+                normal: {
+                    show: true,
+                    textStyle: {}
+                }
+            },
+ 
+            // 数据
+            data: [{
+                name: '刘备',
+                des: '刘备',
+                symbolSize: 70,//节点大小
+                category: 0,//设置节点所属类别
+            },
+            {
+                name: '关羽',
+                des: '关羽',
+                symbolSize: 70,//节点大小
+                category: 0,//设置节点所属类别
+            }
+            ],//...后续数据省略
+            links: [{
+                source: '关羽',//源节点
+                target: '刘备',//目标节点
+                name: '义弟',//关系
+                des: ''
+            }], //定义关系，后续省略
+            categories: categories,//给类别赋值
+           }]
+        };
+        myChart.setOption(option);
+         }
 	}
 }
 </script>
 <style scoped>
+/* #main {
+    width: 100%;
+    height: 100%;
+} */
 .dataSearch {
     /* background-color: brown; */
     width: 100%;
