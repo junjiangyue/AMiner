@@ -3,16 +3,16 @@
 		<div class="bread-crumb">
 			<el-breadcrumb separator=">>">
 				<el-breadcrumb-item><span class="el-icon-menu"></span> 其它</el-breadcrumb-item>
-				<el-breadcrumb-item>领域查询</el-breadcrumb-item>
+				<el-breadcrumb-item>时间查询</el-breadcrumb-item>
 			</el-breadcrumb>
 		</div>
 		<div class="page-body">
       <div class="dataSearch">
         <el-card class="box-card">
           <el-row>
-            <el-col :span="3">领域查询</el-col>
+            <el-col :span="3">关键期刊时间查询</el-col>
             <el-col :span="8">
-              请选择查询对象：<el-select v-model="value" placeholder="请选择查询对象">
+              请选择查询时间：<el-select v-model="value" placeholder="请选择查询时间">
                 <el-option
                   v-for="item in options"
                   :key="item.value"
@@ -52,31 +52,7 @@
           </el-col>
           <el-col :span="17">
             <el-row><p class="txt-field">查询领域：{{field}}</p></el-row>
-            <el-row v-if="value=='Author'">
-              <el-table :data="authorTable" stripe style="width: 100%">
-                <el-table-column prop="authorName" label="作者姓名">
-                </el-table-column>
-                <el-table-column prop="pc" label="发表文章总数">
-                </el-table-column>
-                <el-table-column prop="cn" label="文章被引用总数">
-                </el-table-column>
-                <el-table-column prop="hi" label="H-index">
-                </el-table-column>
-                <el-table-column prop="pi" label="等A-index的P-index">
-                </el-table-column>
-                <el-table-column prop="upi" label="不等A-index的P-index">
-                </el-table-column>
-                <el-table-column prop="authorId" label="作者ID">
-                </el-table-column>
-              </el-table>
-            </el-row>
-            <el-row v-if="value=='Affliation'">
-              <el-table :data="authorTable" stripe style="width: 100%">
-                <el-table-column prop="affiliationId" label="机构名称">
-                </el-table-column>
-              </el-table>
-            </el-row>
-            <el-row v-if="value=='PublicationVenue'">
+            <el-row>
               <el-table :data="authorTable" stripe style="width: 100%">
                 <el-table-column prop="venue" label="期刊或会议名称">
                 </el-table-column>
@@ -96,14 +72,44 @@
             // 防止出现多个echarts初始化的情况
         myChart: '',
         options: [{
-          value: 'Author',
-          label: '关键作者'
+          value: '2022',
+          label: '2022年及以前'
         }, {
-          value: 'Affliation',
-          label: '关键单位'
+          value: '2020',
+          label: '2020年及以前'
         }, {
-          value: 'PublicationVenue',
-          label: '关键期刊或会议'
+          value: '2015',
+          label: '2015年及以前'
+        }, {
+          value: '2010',
+          label: '2010年及以前'
+        }, {
+          value: '2005',
+          label: '2005年及以前'
+        }, {
+          value: '2000',
+          label: '2000年及以前'
+        }, {
+          value: '1995',
+          label: '1995年及以前'
+        }, {
+          value: '1990',
+          label: '1990年及以前'
+        }, {
+          value: '1980',
+          label: '1980年及以前'
+        }, {
+          value: '1970',
+          label: '1970年及以前'
+        }, {
+          value: '1960',
+          label: '1960年及以前'
+        }, {
+          value: '1950',
+          label: '1950年及以前'
+        }, {
+          value: '1940',
+          label: '1940年及以前'
         }],
         value: '',
         tableData: [],
@@ -134,51 +140,20 @@
         console.log('index:',index);
         console.log(index.researchInterest);
         this.field=index.researchInterest;
-        if(this.value=="Author") {
-          this.$axios({
-            method:"get",
-            url: 'http://localhost:3000/findKeyAuthor',
-            params:{
-              researchInterest:index.researchInterest
-            }
-          }).then(res=>{
-            console.log("关键作者：",res);
-            this.authorTable=res.data.list;
-            console.log(res.data);
-          },err=>{
-            console.log(err);
-          })
-        } 
-        else if(this.value=="Affliation") {
-          this.$axios({
-            method:"get",
-            url: 'http://localhost:3000/findKeyAffiliation',
-            params:{
-              researchInterest:index.researchInterest
-            }
-          }).then(res=>{
-            console.log("关键单位：",res);
-            this.authorTable=res.data.list;
-            console.log(res.data);
-          },err=>{
-            console.log(err);
-          })
-        }
-        else if(this.value=="PublicationVenue") {
-          this.$axios({
-            method:"get",
-            url: 'http://localhost:3000/findKeyVenue',
-            params:{
-              researchInterest:index.researchInterest
-            }
-          }).then(res=>{
-            console.log("关键期刊会议：",res);
-            this.authorTable=res.data.list;
-            console.log(res.data);
-          },err=>{
-            console.log(err);
-          })
-        }
+        this.$axios({
+          method:"get",
+          url: 'http://localhost:3000/findKeyVenueTime',
+          params:{
+            researchInterest:index.researchInterest,
+            time:this.value
+          }
+        }).then(res=>{
+          console.log("关键期刊：",res);
+          this.authorTable=res.data;
+          console.log(res.data);
+        },err=>{
+          console.log(err);
+        })
       },
       //每页条数改变时触发 选择一页显示多少行
       handleSizeChange(val) {

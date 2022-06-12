@@ -129,6 +129,9 @@
             }, {
                 "index": "/page/else/searchField",
                 "title": "领域搜索"
+            }, {
+                "index": "/page/else/searchTime",
+                "title": "时间搜索"
             }
         ]
     }
