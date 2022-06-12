@@ -192,7 +192,7 @@ import * as echarts from 'echarts';
             },
             force: {
                 repulsion: 2500,
-                edgeLength: [10, 50]
+                edgeLength: [1, 500]
             },
             draggable: true,
             lineStyle: {
