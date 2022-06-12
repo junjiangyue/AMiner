@@ -41,8 +41,12 @@ import * as echarts from 'echarts';
 	export default {
 		data () {
 			return {
+                nodeList: [],
+                linkList: [],
+                nodeData:[],
+                linkData:[],
 				input: '',
-                authorName: 'Bob Jolls',
+                authorName: 'Rajeevan Chandel',//'Jianbo Liu',
 			}
 		},
         mounted:function(){
@@ -55,12 +59,79 @@ import * as echarts from 'echarts';
             getData() {
                 this.$axios({
           method:"get",
-          url: 'http://localhost:3000/getCooperationByName',
+          url: 'http://localhost:9999/BI/queryEntityByAuthorName',
           params:{
-            authorName:this.authorName
+            EntityType: "Author",
+            searchContent: this.authorName,
+            limit: 20
           }
         }).then(res=>{
           console.log(res);
+
+          this.nodeList = res.data.nodes;
+          this.linkList = res.data.relations;
+          console.log(this.nodeList);
+          console.log(this.linkList);
+          console.log("lalalal");
+          console.log(this.nodeList[19].properties.AffiliationId);
+          for( var i =0;i<this.nodeList.length;i++) {
+            //先判断label
+            if (this.nodeList[i].properties.label[0] == "Author") {
+                // Author
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.authorName,
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 0,//设置节点所属类别
+                })
+            } else if (this.nodeList[i].properties.label[0] == "Subject") {
+                // Subject
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.researchInterest,
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 1,//设置节点所属类别
+                })
+            }else if (this.nodeList[i].properties.label[0] == "Paper") {
+                //Paper
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.title,
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 2,//设置节点所属类别
+                })
+            } else if (this.nodeList[i].properties.label[0] == "Affiliation") {
+                //Affiliation
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.AffiliationId,
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            }
+            // this.nodeData.push({
+            //     name: this.nodeList[i].authorName,
+            //     des: this.nodeList[i].authorName,
+            //     symbolSize: 70,//节点大小
+            //     category: 0,//设置节点所属类别
+            // })
+          }
+          for( var i = 0;i<this.linkList.length;i++) {
+            this.linkData.push({
+                // name: this.nodeList[i].AffiliationId,
+                // des: this.nodeList[i].id,
+                // symbolSize: 70,//节点大小
+                // category: 3,//设置节点所属类别
+                source: ""+this.linkList[i].properties.source,//源节点
+                target: ""+this.linkList[i].properties.target,//目标节点
+                name: this.linkList[i].properties.label,//关系
+                des: this.linkList[i].properties.id
+                })
+          }
         },err=>{
           console.log(err);
         })
@@ -68,11 +139,11 @@ import * as echarts from 'echarts';
 
          getGraph() {
             var myChart = echarts.init(document.getElementById('main'));
-            var categories = [{name:"蜀"},{name:"魏"},{name:"吴"}];
+            var categories = [{name:"Author"},{name:"Subject"},{name:"Paper"},{name:"Affiliation"}];
             var option = {
         // 图的标题
         title: {
-            text: '关联关系和关联实体图'
+            text: '关联关系&实体图'
         },
         // 提示框的配置
         tooltip: {
@@ -146,25 +217,8 @@ import * as echarts from 'echarts';
             },
  
             // 数据
-            data: [{
-                name: '刘备',
-                des: '刘备',
-                symbolSize: 70,//节点大小
-                category: 0,//设置节点所属类别
-            },
-            {
-                name: '关羽',
-                des: '关羽',
-                symbolSize: 70,//节点大小
-                category: 0,//设置节点所属类别
-            }
-            ],//...后续数据省略
-            links: [{
-                source: '关羽',//源节点
-                target: '刘备',//目标节点
-                name: '义弟',//关系
-                des: ''
-            }], //定义关系，后续省略
+            data: this.nodeData,//...后续数据省略
+            links: this.linkData, //定义关系，后续省略
             categories: categories,//给类别赋值
            }]
         };
