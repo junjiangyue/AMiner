@@ -99,7 +99,7 @@ import * as echarts from 'echarts';
             getDataAuthor() {
                 this.$axios({
                 method:"get",
-                url: 'http://localhost:9999/BI/queryEntityByAuthorName',
+                url: 'http://localhost:9999/BI/searchByName',
                 params:{
                     EntityType: "Author",
                     searchContent: this.authorName,
