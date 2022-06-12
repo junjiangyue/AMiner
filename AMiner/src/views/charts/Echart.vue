@@ -6,7 +6,7 @@
                 <el-breadcrumb-item>vue-echart</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <!-- <div id="myChart" style="width: 600px;height:400px;"></div> -->
+        
 		<div class="dataSearch">
                 <el-card class="box-card">
                     <el-row  :gutter="20">
@@ -46,6 +46,7 @@
                     </el-col>
                     <el-col :span="19">
                         <el-card class="graph">
+							<div id="myChart" style="width: 600px;height:400px;"></div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -53,17 +54,22 @@
 	</div>
 </template>
 
-<script type="text/javascript">
+<script>
+import * as echarts from 'echarts';
 	export default {
 		data () {
 			return {
 				source:{},
+				property1:"",
+				property2:"",
 				form:{
 					start:"",
 					end:"",
-					paperType1:[],
-					paperType2:[]
+					paperType1:{},
+					paperType2:{}
 				},
+				step:1,
+				limit:20,
 				pickerOptions:{
 					disabledDate (time) {
 						return time.getTime() > Date.now();
@@ -74,78 +80,204 @@
 				paperType1:[
 					{
 						"name":"作者",
-						"value":"Author"
+						"value":"Author",
+						"property":"authorName",
 					},{
 						"name":"论文",
 						"value":"Paper",
+						"property":"title",
 					},{
 						"name":"研究机构/学校",
-						"value":"Affliation"
+						"value":"Affliation",
+						"property":"AffiliationId",
 					},{
 						"name":"研究主题",
-						"value":"Subject"
+						"value":"Subject",
+						"property":"researchInterest",
 					}
 					,{
 						"name":"会议/期刊",
-						"value":"PublicationVenue"
+						"value":"PublicationVenue",
+						"property":"venue",
 					}
 				],
 				paperType2:[
 					{
 						"name":"作者",
-						"value":"Author"
+						"value":"Author",
+						"property":"authorName",
 					},{
 						"name":"论文",
 						"value":"Paper",
+						"property":"title",
 					},{
 						"name":"研究机构/学校",
-						"value":"Affliation"
+						"value":"Affliation",
+						"property":"AffiliationId",
 					},{
 						"name":"研究主题",
-						"value":"Subject"
+						"value":"Subject",
+						"property":"researchInterest",
 					}
 					,{
 						"name":"会议/期刊",
-						"value":"PublicationVenue"
+						"value":"PublicationVenue",
+						"property":"venue",
 					}
 				],
 			}
 		},
 		methods:{
 			 drawChart() {
-			let echarts = require("echarts");
-     
-			// 基于准备好的dom，初始化echarts实例
-			let myChart = echarts.init(document.getElementById("myChart"));
-			// 指定图表的配置项和数据
-			let option = {
+				var myChart = echarts.init(document.getElementById('myChart'));
+				var categories = [{name:"Author"},{name:"Affiliation"},{name:"Paper"},{name:"Publication Venue"},{name:"Subject"}];
+				var option = {
+				// 图的标题
 				title: {
-				text: "ECharts 入门示例"
+					text: ''
 				},
-				tooltip: {},
-				legend: {
-				data: ["销量"]
+				// 提示框的配置
+				tooltip: {
+					formatter: function (x) {
+						return x.data.des;
+					}
 				},
-				xAxis: {
-				data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+				// 工具箱
+				toolbox: {
+					// 显示工具箱
+					show: true,
+					feature: {
+						mark: {
+							show: true
+						},
+						// 还原
+						restore: {
+							show: true
+						},
+						// 保存为图片
+						saveAsImage: {
+							show: true
+						}
+					}
 				},
-				yAxis: {},
-				series: [
-				{
-					name: "销量",
-					type: "bar",
-					data: [5, 20, 36, 10, 10, 20]
-				}
-				]
-			};
-			// 使用刚指定的配置项和数据显示图表。
-			myChart.setOption(option);
+				legend: [{
+					// selectedMode: 'single',
+					//设置可以根据类别显示or隐藏节点
+					data: categories.map(function (a) {
+						return a.name;
+					})
+				}],
+				series: [{
+					type: 'graph', // 类型:关系图
+					layout: 'force', //图的布局，类型为力导图
+					symbolSize: 40, // 调整节点的大小
+					roam: true, // 是否开启鼠标缩放和平移漫游。默认不开启。如果只想要开启缩放或者平移,可以设置成 'scale' 或者 'move'。设置成 true 为都开启
+					edgeSymbol: ['circle', 'arrow'],
+					edgeSymbolSize: [2, 10],
+					edgeLabel: {
+						normal: {
+							textStyle: {
+								fontSize: 20
+							}
+						}
+					},
+					force: {
+						repulsion: 2500,
+						edgeLength: [10, 50]
+					},
+					draggable: true,
+					lineStyle: {
+						normal: {
+							width: 2,
+							color: '#4b565b',
+						}
+					},
+					edgeLabel: {
+						normal: {
+							show: true,
+							formatter: function (x) {
+								return x.data.name;
+							}
+						}
+					},
+					label: {
+						normal: {
+							show: true,
+							textStyle: {}
+						}
+					},
+		
+					// 数据
+					data: [
+						{
+						name: '刘备',
+						des: '刘备',
+						id:'1',
+						symbolSize: 70,//节点大小
+						category: 0,//设置节点所属类别
+					},
+					{
+						name: '关羽',
+						des: '关羽',
+						id:'2',
+						symbolSize: 70,//节点大小
+						category: 0,//设置节点所属类别
+					}
+					],
+					links: [
+						{
+						source: '1',//源节点
+						target: '2',//目标节点
+						name: '义弟',//关系
+						des: ''
+					}
+					], //定义关系，后续省略
+					categories: categories,//给类别赋值
+				}]
+				};
+				myChart.setOption(option);
 			},
 			search(){
+				switch (this.form.paperType1){
+					case "Author":this.property1 = "authorName";break;
+					case "Paper":this.property1 = "title";break;
+					case "Affliation":this.property1 = "AffiliationId";break;
+					case "Subject":this.property1 = "researchInterest";break;
+					case "PublicationVenue":this.property1 = "venue";break;
+					default:break;
+				}
+				switch (this.form.paperType2){
+					case "Author":this.property2 = "authorName";break;
+					case "Paper":this.property2 = "title";break;
+					case "Affliation":this.property2 = "AffiliationId";break;
+					case "Subject":this.property2 = "researchInterest";break;
+					case "PublicationVenue":this.property2= "venue";break;
+					default:break;
+				}
 				console.log("时间",this.form)
 				console.log("实体1",this.input1)
 				console.log("实体2",this.input2)
-			}
+				console.log("类型",this.property1)
+				console.log("类型",this.property2)
+				this.$axios({
+					methods:"get",
+					url:'http://localhost:8080/BI/searchByAuthorAffiliation',
+					params:{
+						step:this.step,
+						limit:this.limit,
+						first:this.input1,
+						second:this.input2,
+						type1:this.form.paperType1,
+						type2:this.form.paperType2,
+						property1:this.property1,
+						property2:this.property2,
+					}
+				}).then(res=>{
+					console.log(res)
+
+				})
+
+			},
 		},
 		mounted() {
 			this.drawChart();
