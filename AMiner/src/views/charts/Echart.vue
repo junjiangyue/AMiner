@@ -229,6 +229,7 @@ import * as echarts from 'echarts';
 							}
 						}
 					},
+					emphasis: {focus: 'adjacency'},//当鼠标移动到节点上，突出显示节点以及节点的边和邻接节点
 					force: {
 						repulsion: 2500,
 						edgeLength: [1, 200]
@@ -301,7 +302,7 @@ import * as echarts from 'echarts';
 				console.log("类型",this.property2)
 				this.$axios({
 					methods:"get",
-					url:'http://localhost:9999/BI/searchByAuthorAffiliation',
+					url:'http://localhost:9999/BI/multiSearch',
 					params:{
 						step:this.step,
 						limit:this.limit,
