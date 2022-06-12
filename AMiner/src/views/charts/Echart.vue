@@ -2,8 +2,8 @@
 	<div class="chart-area">
 		 <div class="crumbs">
             <el-breadcrumb separator=">>">
-                <el-breadcrumb-item><i class="el-icon-star-on"></i> 图表</el-breadcrumb-item>
-                <el-breadcrumb-item>vue-echart</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-star-on"></i>基本查询</el-breadcrumb-item>
+                <el-breadcrumb-item>多跳关系查询</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         

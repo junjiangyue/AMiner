@@ -1,6 +1,6 @@
 <template>
 	<div class="header">
-		<div class="logo">后台管理系统</div>
+		<div class="logo">学术领域知识图谱可视化系统</div>
 	</div>
 </template>
 

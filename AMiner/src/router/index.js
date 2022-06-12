@@ -142,10 +142,6 @@ export default new Router({
 							component:Tree
 						},
 						{
-							path:'graph',
-							component:Graph
-						},
-						{
 							path:'searchField',
 							component:SearchField
 						},
@@ -162,6 +158,10 @@ export default new Router({
 						{
 							path:'EChart',
 							component:Echart
+						},
+						{
+							path:'graph',
+							component:Graph
 						}
 					]
 				},

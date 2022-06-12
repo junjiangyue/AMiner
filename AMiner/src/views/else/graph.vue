@@ -2,8 +2,8 @@
 	<div class="page-area">
 		<div class="bread-crumb">
 			<el-breadcrumb separator=">>">
-				<el-breadcrumb-item><span class="el-icon-menu"></span> 其它</el-breadcrumb-item>
-				<el-breadcrumb-item>树形组件</el-breadcrumb-item>
+				<el-breadcrumb-item><span class="el-icon-menu"></span> 基本查询</el-breadcrumb-item>
+				<el-breadcrumb-item>图数据展示</el-breadcrumb-item>
 			</el-breadcrumb>
 		</div>
 		<div class="page-body">
