@@ -10,10 +10,17 @@
             <div class="dataSearch">
                 <el-card class="box-card">
                     <el-row>
-                        <el-col :span="12">在线智搜</el-col>
-                        <el-col :span="12">
+                        <el-col :span="4">在线智搜</el-col>
+                        <el-col :span="10">
+                            <el-col :span="10">
+								<el-select v-model="form.paperType1" placeholder="请选择实体类型" clearable>
+									<el-option :key="item.value" :value="item.value" :label="item.name" :disabled="item.disabled" v-for="item in paperType1"></el-option>
+								</el-select>
+                            </el-col>
+                        </el-col>
+                        <el-col :span="10">
                             <el-col :span="12">
-                            <el-input v-model="input" placeholder="请输入内容"></el-input>
+                            <el-input v-model="authorName" placeholder="请输入内容"></el-input>
                             </el-col>
                             <el-col :span="12">
                                 <el-button round @click="search">搜索</el-button>
@@ -22,13 +29,13 @@
                     </el-row>
                 </el-card>
                 <el-row>
-                    <el-col :span="5">
+                    <el-col :span="3">
                         <el-card class="information">
                         </el-card>
                     </el-col>
-                    <el-col :span="19">
+                    <el-col :span="21">
                         <el-card class="graph">
-                            <div id="main" style="width: 600px;height:400px;"></div>
+                            <div id="main" style="width: 1000px;height:800px;"></div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -41,63 +48,96 @@ import * as echarts from 'echarts';
 	export default {
 		data () {
 			return {
+                form:{
+					paperType1:[]
+				},
+                paperType1:[
+					{
+						"name":"作者",
+						"value":"Author"
+					},{
+						"name":"论文",
+						"value":"Paper",
+					},{
+						"name":"研究机构/学校",
+						"value":"Affiliation"
+					},{
+						"name":"研究主题",
+						"value":"Subject"
+					}
+					,{
+						"name":"会议/期刊",
+						"value":"PublicationVenue"
+					}
+				],
                 nodeList: [],
                 linkList: [],
                 nodeData:[],
                 linkData:[],
 				input: '',
-                authorName: 'Rajeevan Chandel',//'Jianbo Liu',
+                authorName: '',//'Rajeevan Chandel',//'Jianbo Liu',
 			}
 		},
         mounted:function(){
-            this.getData();
+
         },
         methods: {
             search() {
-                this.getGraph();
+                if(this.form.paperType1=="Author") {
+                    this.getDataAuthor();
+                } else if (this.form.paperType1=="Paper") {
+                    console.log("teststets")
+                    this.getDataPaper();
+                } else if (this.form.paperType1=="Affiliation") {//机构
+                    this.getDataAffiliation();
+                } else if (this.form.paperType1=="Subject") {
+                    this.getDataSubject();
+                } else {//期刊
+                    this.getDataPublicationVenue();
+                }
             },
-            getData() {
+            getDataAuthor() {
                 this.$axios({
-          method:"get",
-          url: 'http://localhost:9999/BI/queryEntityByAuthorName',
-          params:{
-            EntityType: "Author",
-            searchContent: this.authorName,
-            limit: 20
-          }
-        }).then(res=>{
-          console.log(res);
+                method:"get",
+                url: 'http://localhost:9999/BI/queryEntityByAuthorName',
+                params:{
+                    EntityType: "Author",
+                    searchContent: this.authorName,
+                    limit: 20
+                }
+                }).then(res=>{
+                console.log(res);
 
-          this.nodeList = res.data.nodes;
-          this.linkList = res.data.relations;
-          console.log(this.nodeList);
-          console.log(this.linkList);
-          console.log("lalalal");
-          console.log(this.nodeList[19].properties.AffiliationId);
-          for( var i =0;i<this.nodeList.length;i++) {
-            //先判断label
-            if (this.nodeList[i].properties.label[0] == "Author") {
-                // Author
-                this.nodeData.push({
-                name: ""+this.nodeList[i].properties.authorName,
-                id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
-                symbolSize: 70,//节点大小
-                category: 0,//设置节点所属类别
+                this.nodeList = res.data.nodes;
+                this.linkList = res.data.relations;
+                console.log(this.nodeList);
+                console.log(this.linkList);
+                console.log("lalalal");
+                //   console.log(this.nodeList[19].properties.AffiliationId);
+                for( var i =0;i<this.nodeList.length;i++) {
+                //先判断label
+                if (this.nodeList[i].properties.label[0] == "Author") {
+                    // Author
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 0,//设置节点所属类别
                 })
-            } else if (this.nodeList[i].properties.label[0] == "Subject") {
-                // Subject
-                this.nodeData.push({
-                name: ""+this.nodeList[i].properties.researchInterest,
-                id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
-                symbolSize: 70,//节点大小
-                category: 1,//设置节点所属类别
+                } else if (this.nodeList[i].properties.label[0] == "Subject") {
+                    // Subject
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 1,//设置节点所属类别
                 })
             }else if (this.nodeList[i].properties.label[0] == "Paper") {
                 //Paper
                 this.nodeData.push({
-                name: ""+this.nodeList[i].properties.title,
+                name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
                 des: this.nodeList[i].properties.id,
                 symbolSize: 70,//节点大小
@@ -106,7 +146,7 @@ import * as echarts from 'echarts';
             } else if (this.nodeList[i].properties.label[0] == "Affiliation") {
                 //Affiliation
                 this.nodeData.push({
-                name: ""+this.nodeList[i].properties.AffiliationId,
+                name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
                 des: this.nodeList[i].properties.id,
                 symbolSize: 70,//节点大小
@@ -135,11 +175,354 @@ import * as echarts from 'echarts';
         },err=>{
           console.log(err);
         })
+                        this.getGraph();
+            },
+
+            getDataPaper() {
+
+                this.$axios({
+                method:"get",
+                url: 'http://localhost:9999/BI/queryEntityByPageTitle',
+                params:{
+                    EntityType: "Paper",
+                    searchContent: this.authorName,
+                    limit: 50
+                }
+                }).then(res=>{
+                console.log(res);
+
+                this.nodeList = res.data.nodes;
+                this.linkList = res.data.relations;
+                console.log(this.nodeList);
+                console.log(this.linkList);
+                console.log("lalalal");
+                //   console.log(this.nodeList[19].properties.AffiliationId);
+                for( var i =0;i<this.nodeList.length;i++) {
+                //先判断label
+                if (this.nodeList[i].properties.label[0] == "Author") {
+                    // Author
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 0,//设置节点所属类别
+                })
+                } else if (this.nodeList[i].properties.label[0] == "Subject") {
+                    // Subject
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 1,//设置节点所属类别
+                })
+            }else if (this.nodeList[i].properties.label[0] == "Paper") {
+                //Paper
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 2,//设置节点所属类别
+                })
+            } else if (this.nodeList[i].properties.label[0] == "Affiliation") {
+                //Affiliation
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            }
+            // this.nodeData.push({
+            //     name: this.nodeList[i].authorName,
+            //     des: this.nodeList[i].authorName,
+            //     symbolSize: 70,//节点大小
+            //     category: 0,//设置节点所属类别
+            // })
+          }
+          for( var i = 0;i<this.linkList.length;i++) {
+            this.linkData.push({
+                // name: this.nodeList[i].AffiliationId,
+                // des: this.nodeList[i].id,
+                // symbolSize: 70,//节点大小
+                // category: 3,//设置节点所属类别
+                source: ""+this.linkList[i].properties.source,//源节点
+                target: ""+this.linkList[i].properties.target,//目标节点
+                name: this.linkList[i].properties.label,//关系
+                des: this.linkList[i].properties.id
+                })
+          }
+        },err=>{
+          console.log(err);
+        })
+                        this.getGraph();
+            },
+            getDataAffiliation() {
+                console.log(this.authorName);
+                this.$axios({
+                method:"get",
+                url: 'http://localhost:9999/BI/queryEntityByAffiliationId',
+                params:{
+                    EntityType: "Affiliation",
+                    searchContent: this.authorName,
+                    limit: 20
+                }
+                }).then(res=>{
+                console.log(res);
+
+                this.nodeList = res.data.nodes;
+                this.linkList = res.data.relations;
+                console.log(this.nodeList);
+                console.log(this.linkList);
+                console.log("lalalal");
+                //   console.log(this.nodeList[19].properties.AffiliationId);
+                for( var i =0;i<this.nodeList.length;i++) {
+                //先判断label
+                if (this.nodeList[i].properties.label[0] == "Author") {
+                    // Author
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 0,//设置节点所属类别
+                })
+                } else if (this.nodeList[i].properties.label[0] == "Subject") {
+                    // Subject
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 1,//设置节点所属类别
+                })
+            }else if (this.nodeList[i].properties.label[0] == "Paper") {
+                //Paper
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 2,//设置节点所属类别
+                })
+            } else if (this.nodeList[i].properties.label[0] == "Affiliation") {
+                //Affiliation
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            }
+            // this.nodeData.push({
+            //     name: this.nodeList[i].authorName,
+            //     des: this.nodeList[i].authorName,
+            //     symbolSize: 70,//节点大小
+            //     category: 0,//设置节点所属类别
+            // })
+          }
+          for( var i = 0;i<this.linkList.length;i++) {
+            this.linkData.push({
+                // name: this.nodeList[i].AffiliationId,
+                // des: this.nodeList[i].id,
+                // symbolSize: 70,//节点大小
+                // category: 3,//设置节点所属类别
+                source: ""+this.linkList[i].properties.source,//源节点
+                target: ""+this.linkList[i].properties.target,//目标节点
+                name: this.linkList[i].properties.label,//关系
+                des: this.linkList[i].properties.id
+                })
+          }
+        },err=>{
+          console.log(err);
+        })
+                        this.getGraph();
+            
+            },
+            getDataSubject() {
+                this.$axios({
+                method:"get",
+                url: 'http://localhost:9999/BI/queryEntityByResearchInterest',
+                params:{
+                    EntityType: "Subject",
+                    searchContent: this.authorName,
+                    limit: 20
+                }
+                }).then(res=>{
+                console.log(res);
+
+                this.nodeList = res.data.nodes;
+                this.linkList = res.data.relations;
+                console.log(this.nodeList);
+                console.log(this.linkList);
+                console.log("lalalal");
+                //   console.log(this.nodeList[19].properties.AffiliationId);
+                for( var i =0;i<this.nodeList.length;i++) {
+                //先判断label
+                if (this.nodeList[i].properties.label[0] == "Author") {
+                    // Author
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 0,//设置节点所属类别
+                })
+                } else if (this.nodeList[i].properties.label[0] == "Subject") {
+                    // Subject
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 1,//设置节点所属类别
+                })
+            }else if (this.nodeList[i].properties.label[0] == "Paper") {
+                //Paper
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 2,//设置节点所属类别
+                })
+            } else if (this.nodeList[i].properties.label[0] == "Affiliation") {
+                //Affiliation
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            }
+            // this.nodeData.push({
+            //     name: this.nodeList[i].authorName,
+            //     des: this.nodeList[i].authorName,
+            //     symbolSize: 70,//节点大小
+            //     category: 0,//设置节点所属类别
+            // })
+          }
+          for( var i = 0;i<this.linkList.length;i++) {
+            this.linkData.push({
+                // name: this.nodeList[i].AffiliationId,
+                // des: this.nodeList[i].id,
+                // symbolSize: 70,//节点大小
+                // category: 3,//设置节点所属类别
+                source: ""+this.linkList[i].properties.source,//源节点
+                target: ""+this.linkList[i].properties.target,//目标节点
+                name: this.linkList[i].properties.label,//关系
+                des: this.linkList[i].properties.id
+                })
+          }
+        },err=>{
+          console.log(err);
+        })
+                        this.getGraph();
+            
+            
+            },
+            getDataPublicationVenue() {
+                this.$axios({
+                method:"get",
+                url: 'http://localhost:9999/BI/queryEntityByVenue',
+                params:{
+                    EntityType: "Publication",
+                    searchContent: this.authorName,
+                    limit: 20
+                }
+                }).then(res=>{
+                console.log(res);
+
+                this.nodeList = res.data.nodes;
+                this.linkList = res.data.relations;
+                console.log(this.nodeList);
+                console.log(this.linkList);
+                console.log("lalalal");
+                //   console.log(this.nodeList[19].properties.AffiliationId);
+                for( var i =0;i<this.nodeList.length;i++) {
+                //先判断label
+                if (this.nodeList[i].properties.label[0] == "Author") {
+                    // Author
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 0,//设置节点所属类别
+                })
+                } else if (this.nodeList[i].properties.label[0] == "Subject") {
+                    // Subject
+                    this.nodeData.push({
+                    name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
+                    id:""+this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.id,
+                    symbolSize: 70,//节点大小
+                    category: 1,//设置节点所属类别
+                })
+            }else if (this.nodeList[i].properties.label[0] == "Paper") {
+                //Paper
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 2,//设置节点所属类别
+                })
+            } else if (this.nodeList[i].properties.label[0] == "Affiliation") {
+                //Affiliation
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            } else {
+                //publication
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.venue.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.id,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            }
+            // this.nodeData.push({
+            //     name: this.nodeList[i].authorName,
+            //     des: this.nodeList[i].authorName,
+            //     symbolSize: 70,//节点大小
+            //     category: 0,//设置节点所属类别
+            // })
+          }
+          for( var i = 0;i<this.linkList.length;i++) {
+            this.linkData.push({
+                // name: this.nodeList[i].AffiliationId,
+                // des: this.nodeList[i].id,
+                // symbolSize: 70,//节点大小
+                // category: 3,//设置节点所属类别
+                source: ""+this.linkList[i].properties.source,//源节点
+                target: ""+this.linkList[i].properties.target,//目标节点
+                name: this.linkList[i].properties.label,//关系
+                des: this.linkList[i].properties.id
+                })
+          }
+        },err=>{
+          console.log(err);
+        })
+                        this.getGraph();
+            
+            
+            
             },
 
          getGraph() {
             var myChart = echarts.init(document.getElementById('main'));
-            var categories = [{name:"Author"},{name:"Subject"},{name:"Paper"},{name:"Affiliation"}];
+            var categories = [{name:"Author"},{name:"Subject"},{name:"Paper"},{name:"Affiliation"},{name:"PublicationVenue"}];
             var option = {
         // 图的标题
         title: {
@@ -148,7 +531,7 @@ import * as echarts from 'echarts';
         // 提示框的配置
         tooltip: {
             formatter: function (x) {
-                return x.data.des;
+                return x.data.name;
             }
         },
         // 工具箱
@@ -190,9 +573,10 @@ import * as echarts from 'echarts';
                     }
                 }
             },
+            emphasis: {focus: 'adjacency'},//当鼠标移动到节点上，突出显示节点以及节点的边和邻接节点
             force: {
                 repulsion: 2500,
-                edgeLength: [10, 50]
+                edgeLength: [1, 500]
             },
             draggable: true,
             lineStyle: {
