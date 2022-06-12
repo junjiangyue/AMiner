@@ -35,8 +35,8 @@
           </el-row>
         </el-card>
         <el-row>
-          <el-col :span="6">
-            <el-table :data="tableData" stripe style="width: 100%">
+          <el-col :span="7">
+            <el-table :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)" stripe style="width: 100%">
               <el-table-column prop="researchInterest" label="领域" width="180">
               </el-table-column>
               <el-table-column fixed="right" label="操作" width="100">
@@ -45,8 +45,12 @@
                 </template>
               </el-table-column>
             </el-table>
+            <el-pagination small align='center' @size-change="handleSizeChange" @current-change="handleCurrentChange"
+              :current-page="currentPage" :page-sizes="[1,5,10,20]" :page-size="pageSize" 
+              layout="total, prev, pager, next, jumper" :total="tableData.length" class="pagination">
+            </el-pagination>
           </el-col>
-          <el-col :span="18">
+          <el-col :span="17">
             <el-row><p class="txt-field">查询领域：{{field}}</p></el-row>
             <el-row v-if="value=='Author'">
               <el-table :data="authorTable" stripe style="width: 100%">
@@ -66,7 +70,18 @@
                 </el-table-column>
               </el-table>
             </el-row>
-            
+            <el-row v-if="value=='Affliation'">
+              <el-table :data="authorTable" stripe style="width: 100%">
+                <el-table-column prop="affiliationId" label="机构名称">
+                </el-table-column>
+              </el-table>
+            </el-row>
+            <el-row v-if="value=='PublicationVenue'">
+              <el-table :data="authorTable" stripe style="width: 100%">
+                <el-table-column prop="venue" label="期刊或会议名称">
+                </el-table-column>
+              </el-table>
+            </el-row>
           </el-col>
         </el-row>
       </div>
@@ -94,6 +109,9 @@
         tableData: [],
         authorTable: [],
         field:"",
+        currentPage: 1, // 当前页码
+        total: 20, // 总条数
+        pageSize: 20, // 每页的数据条数
 			}
 		},
     methods: {
@@ -103,7 +121,6 @@
           url: 'http://localhost:3000/findResearchInterest',
           params:{
             researchInterest:this.input,
-            entity:this.value
           }
         }).then(res=>{
           console.log(res);
@@ -117,19 +134,62 @@
         console.log('index:',index);
         console.log(index.researchInterest);
         this.field=index.researchInterest;
-        this.$axios({
-          method:"get",
-          url: 'http://localhost:3000/findKeyAuthor',
-          params:{
-            researchInterest:index.researchInterest
-          }
-        }).then(res=>{
-          console.log("关键作者：",res);
-          this.authorTable=res.data;
-          console.log(res.data);
-        },err=>{
-          console.log(err);
-        })
+        if(this.value=="Author") {
+          this.$axios({
+            method:"get",
+            url: 'http://localhost:3000/findKeyAuthor',
+            params:{
+              researchInterest:index.researchInterest
+            }
+          }).then(res=>{
+            console.log("关键作者：",res);
+            this.authorTable=res.data;
+            console.log(res.data);
+          },err=>{
+            console.log(err);
+          })
+        } 
+        else if(this.value=="Affliation") {
+          this.$axios({
+            method:"get",
+            url: 'http://localhost:3000/findKeyAffiliation',
+            params:{
+              researchInterest:index.researchInterest
+            }
+          }).then(res=>{
+            console.log("关键单位：",res);
+            this.authorTable=res.data;
+            console.log(res.data);
+          },err=>{
+            console.log(err);
+          })
+        }
+        else if(this.value=="PublicationVenue") {
+          this.$axios({
+            method:"get",
+            url: 'http://localhost:3000/findKeyVenue',
+            params:{
+              researchInterest:index.researchInterest
+            }
+          }).then(res=>{
+            console.log("关键期刊会议：",res);
+            this.authorTable=res.data;
+            console.log(res.data);
+          },err=>{
+            console.log(err);
+          })
+        }
+      },
+      //每页条数改变时触发 选择一页显示多少行
+      handleSizeChange(val) {
+          console.log(`每页 ${val} 条`);
+          this.currentPage = 1;
+          this.pageSize = val;
+      },
+      //当前页改变时触发 跳转其他页
+      handleCurrentChange(val) {
+          console.log(`当前页: ${val}`);
+          this.currentPage = val;
       },
     }
   }
