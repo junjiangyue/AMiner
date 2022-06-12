@@ -29,11 +29,16 @@
                     </el-row>
                 </el-card>
                 <el-row>
-                    <el-col :span="3">
-                        <el-card class="information">
+                    <el-col :span="4">
+                        <el-card class="information" >
+							<div id="mytable" style="height:800px;">
+							<div v-if="category!=-1" >
+							<li :key="item.value" v-for="(key,item) in keys,tabledata">{{item}}:{{key}}</li>
+							</div>
+							</div>
                         </el-card>
                     </el-col>
-                    <el-col :span="21">
+                    <el-col :span="20">
                         <el-card class="graph">
                             <div id="main" style="width: 1000px;height:800px;"></div>
                         </el-card>
@@ -48,6 +53,19 @@ import * as echarts from 'echarts';
 	export default {
 		data () {
 			return {
+                category:-1,
+                tabledata:{
+					name: "",
+					id:"",
+					des: "",
+					cn:0,
+					hi:0,
+					pc:0,
+					pi:0,
+					upi:0,
+					symbolSize: 70,//节点大小
+					category: 0,//设置节点所属类别
+				},
                 form:{
 					paperType1:[]
 				},
@@ -119,9 +137,9 @@ import * as echarts from 'echarts';
                 if (this.nodeList[i].properties.label[0] == "Author") {
                     // Author
                     this.nodeData.push({
-                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    name: ""+this.nodeList[i].properties.authorName,
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.authorName,
                     symbolSize: 70,//节点大小
                     category: 0,//设置节点所属类别
                 })
@@ -130,7 +148,7 @@ import * as echarts from 'echarts';
                     this.nodeData.push({
                     name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.researchInterest,
                     symbolSize: 70,//节点大小
                     category: 1,//设置节点所属类别
                 })
@@ -139,7 +157,7 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.title,
                 symbolSize: 70,//节点大小
                 category: 2,//设置节点所属类别
                 })
@@ -148,28 +166,27 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.AffiliationId,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            } else {
+                //publication
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.venue.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.venue,
                 symbolSize: 70,//节点大小
                 category: 3,//设置节点所属类别
                 })
             }
-            // this.nodeData.push({
-            //     name: this.nodeList[i].authorName,
-            //     des: this.nodeList[i].authorName,
-            //     symbolSize: 70,//节点大小
-            //     category: 0,//设置节点所属类别
-            // })
           }
           for( var i = 0;i<this.linkList.length;i++) {
             this.linkData.push({
-                // name: this.nodeList[i].AffiliationId,
-                // des: this.nodeList[i].id,
-                // symbolSize: 70,//节点大小
-                // category: 3,//设置节点所属类别
                 source: ""+this.linkList[i].properties.source,//源节点
                 target: ""+this.linkList[i].properties.target,//目标节点
                 name: this.linkList[i].properties.label,//关系
-                des: this.linkList[i].properties.id
+                des: this.linkList[i].properties.label
                 })
           }
         },err=>{
@@ -177,7 +194,6 @@ import * as echarts from 'echarts';
         })
                         this.getGraph();
             },
-
             getDataPaper() {
 
                 this.$axios({
@@ -202,9 +218,9 @@ import * as echarts from 'echarts';
                 if (this.nodeList[i].properties.label[0] == "Author") {
                     // Author
                     this.nodeData.push({
-                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    name: ""+this.nodeList[i].properties.authorName,
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.authorName,
                     symbolSize: 70,//节点大小
                     category: 0,//设置节点所属类别
                 })
@@ -213,7 +229,7 @@ import * as echarts from 'echarts';
                     this.nodeData.push({
                     name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.researchInterest,
                     symbolSize: 70,//节点大小
                     category: 1,//设置节点所属类别
                 })
@@ -222,7 +238,7 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.title,
                 symbolSize: 70,//节点大小
                 category: 2,//设置节点所属类别
                 })
@@ -231,28 +247,27 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.AffiliationId,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            } else {
+                //publication
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.venue.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.venue,
                 symbolSize: 70,//节点大小
                 category: 3,//设置节点所属类别
                 })
             }
-            // this.nodeData.push({
-            //     name: this.nodeList[i].authorName,
-            //     des: this.nodeList[i].authorName,
-            //     symbolSize: 70,//节点大小
-            //     category: 0,//设置节点所属类别
-            // })
           }
           for( var i = 0;i<this.linkList.length;i++) {
             this.linkData.push({
-                // name: this.nodeList[i].AffiliationId,
-                // des: this.nodeList[i].id,
-                // symbolSize: 70,//节点大小
-                // category: 3,//设置节点所属类别
                 source: ""+this.linkList[i].properties.source,//源节点
                 target: ""+this.linkList[i].properties.target,//目标节点
                 name: this.linkList[i].properties.label,//关系
-                des: this.linkList[i].properties.id
+                des: this.linkList[i].properties.label
                 })
           }
         },err=>{
@@ -284,9 +299,9 @@ import * as echarts from 'echarts';
                 if (this.nodeList[i].properties.label[0] == "Author") {
                     // Author
                     this.nodeData.push({
-                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    name: ""+this.nodeList[i].properties.authorName,
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.authorName,
                     symbolSize: 70,//节点大小
                     category: 0,//设置节点所属类别
                 })
@@ -295,7 +310,7 @@ import * as echarts from 'echarts';
                     this.nodeData.push({
                     name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.researchInterest,
                     symbolSize: 70,//节点大小
                     category: 1,//设置节点所属类别
                 })
@@ -304,7 +319,7 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.title,
                 symbolSize: 70,//节点大小
                 category: 2,//设置节点所属类别
                 })
@@ -313,35 +328,33 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.AffiliationId,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            } else {
+                //publication
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.venue.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.venue,
                 symbolSize: 70,//节点大小
                 category: 3,//设置节点所属类别
                 })
             }
-            // this.nodeData.push({
-            //     name: this.nodeList[i].authorName,
-            //     des: this.nodeList[i].authorName,
-            //     symbolSize: 70,//节点大小
-            //     category: 0,//设置节点所属类别
-            // })
           }
           for( var i = 0;i<this.linkList.length;i++) {
             this.linkData.push({
-                // name: this.nodeList[i].AffiliationId,
-                // des: this.nodeList[i].id,
-                // symbolSize: 70,//节点大小
-                // category: 3,//设置节点所属类别
                 source: ""+this.linkList[i].properties.source,//源节点
                 target: ""+this.linkList[i].properties.target,//目标节点
                 name: this.linkList[i].properties.label,//关系
-                des: this.linkList[i].properties.id
+                des: this.linkList[i].properties.label
                 })
           }
         },err=>{
           console.log(err);
         })
-                        this.getGraph();
-            
+                this.getGraph();
             },
             getDataSubject() {
                 this.$axios({
@@ -366,9 +379,9 @@ import * as echarts from 'echarts';
                 if (this.nodeList[i].properties.label[0] == "Author") {
                     // Author
                     this.nodeData.push({
-                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    name: ""+this.nodeList[i].properties.authorName,
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.authorName,
                     symbolSize: 70,//节点大小
                     category: 0,//设置节点所属类别
                 })
@@ -377,7 +390,7 @@ import * as echarts from 'echarts';
                     this.nodeData.push({
                     name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.researchInterest,
                     symbolSize: 70,//节点大小
                     category: 1,//设置节点所属类别
                 })
@@ -386,7 +399,7 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.title,
                 symbolSize: 70,//节点大小
                 category: 2,//设置节点所属类别
                 })
@@ -395,36 +408,33 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.AffiliationId,
+                symbolSize: 70,//节点大小
+                category: 3,//设置节点所属类别
+                })
+            } else {
+                //publication
+                this.nodeData.push({
+                name: ""+this.nodeList[i].properties.venue.substring(0,15)+'...',
+                id:""+this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.venue,
                 symbolSize: 70,//节点大小
                 category: 3,//设置节点所属类别
                 })
             }
-            // this.nodeData.push({
-            //     name: this.nodeList[i].authorName,
-            //     des: this.nodeList[i].authorName,
-            //     symbolSize: 70,//节点大小
-            //     category: 0,//设置节点所属类别
-            // })
           }
           for( var i = 0;i<this.linkList.length;i++) {
             this.linkData.push({
-                // name: this.nodeList[i].AffiliationId,
-                // des: this.nodeList[i].id,
-                // symbolSize: 70,//节点大小
-                // category: 3,//设置节点所属类别
                 source: ""+this.linkList[i].properties.source,//源节点
                 target: ""+this.linkList[i].properties.target,//目标节点
                 name: this.linkList[i].properties.label,//关系
-                des: this.linkList[i].properties.id
+                des: this.linkList[i].properties.label
                 })
           }
         },err=>{
           console.log(err);
         })
-                        this.getGraph();
-            
-            
+                this.getGraph();
             },
             getDataPublicationVenue() {
                 this.$axios({
@@ -449,9 +459,9 @@ import * as echarts from 'echarts';
                 if (this.nodeList[i].properties.label[0] == "Author") {
                     // Author
                     this.nodeData.push({
-                    name: ""+this.nodeList[i].properties.authorName.substring(0,15)+'...',
+                    name: ""+this.nodeList[i].properties.authorName,
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.authorName,
                     symbolSize: 70,//节点大小
                     category: 0,//设置节点所属类别
                 })
@@ -460,7 +470,7 @@ import * as echarts from 'echarts';
                     this.nodeData.push({
                     name: ""+this.nodeList[i].properties.researchInterest.substring(0,15)+'...',
                     id:""+this.nodeList[i].properties.id,
-                    des: this.nodeList[i].properties.id,
+                    des: this.nodeList[i].properties.researchInterest,
                     symbolSize: 70,//节点大小
                     category: 1,//设置节点所属类别
                 })
@@ -469,7 +479,7 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.title.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.title,
                 symbolSize: 70,//节点大小
                 category: 2,//设置节点所属类别
                 })
@@ -478,7 +488,7 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.AffiliationId.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.AffiliationId,
                 symbolSize: 70,//节点大小
                 category: 3,//设置节点所属类别
                 })
@@ -487,40 +497,28 @@ import * as echarts from 'echarts';
                 this.nodeData.push({
                 name: ""+this.nodeList[i].properties.venue.substring(0,15)+'...',
                 id:""+this.nodeList[i].properties.id,
-                des: this.nodeList[i].properties.id,
+                des: this.nodeList[i].properties.venue,
                 symbolSize: 70,//节点大小
                 category: 3,//设置节点所属类别
                 })
             }
-            // this.nodeData.push({
-            //     name: this.nodeList[i].authorName,
-            //     des: this.nodeList[i].authorName,
-            //     symbolSize: 70,//节点大小
-            //     category: 0,//设置节点所属类别
-            // })
           }
           for( var i = 0;i<this.linkList.length;i++) {
             this.linkData.push({
-                // name: this.nodeList[i].AffiliationId,
-                // des: this.nodeList[i].id,
-                // symbolSize: 70,//节点大小
-                // category: 3,//设置节点所属类别
                 source: ""+this.linkList[i].properties.source,//源节点
                 target: ""+this.linkList[i].properties.target,//目标节点
                 name: this.linkList[i].properties.label,//关系
-                des: this.linkList[i].properties.id
+                des: this.linkList[i].properties.label
                 })
           }
         },err=>{
           console.log(err);
         })
-                        this.getGraph();
-            
-            
-            
+                this.getGraph();
             },
 
          getGraph() {
+            let vim = this
             var myChart = echarts.init(document.getElementById('main'));
             var categories = [{name:"Author"},{name:"Subject"},{name:"Paper"},{name:"Affiliation"},{name:"PublicationVenue"}];
             var option = {
@@ -606,7 +604,21 @@ import * as echarts from 'echarts';
             categories: categories,//给类别赋值
            }]
         };
-        myChart.setOption(option);
+            myChart.setOption(option);
+            myChart.on('click', function (param){
+            console.log('param---->', param);  // 打印出param, 可以看到里边有很多参数可以使用
+				// 获取节点点击的数组序号
+					vim.tabledata = param.data;
+					vim.category = param.data.category
+					this.cn = param.data.cn
+					console.log(vim.tabledata)
+                    console.log(vim.tabledata.des)
+					console.log(vim.category)
+					var keys= Object.keys(vim.tabledata);
+					var values= Object.values(vim.tabledata);
+					vim.keys = keys
+					vim.values = values
+				});
          }
 	}
 }
